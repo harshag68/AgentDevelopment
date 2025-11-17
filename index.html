@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Gestión de Drivers - Falabella</title>
+
+<style>
+  :root{
+    --primary: #4f46e5;
+    --ok:#10b981;
+    --bad:#ef4444;
+    --muted:#6b7280;
+  }
+  body{
+    font-family:system-ui,Segoe UI,Roboto,Arial;
+    background:#f6f7fb;
+    color:#111;
+    margin:0;
+    padding:24px;
+  }
+  .wrap{max-width:1200px;margin:auto;}
+  .card{
+    background:#fff;border-radius:12px;
+    box-shadow:0 6px 20px rgba(0,0,0,.08);
+    padding:16px;margin-bottom:20px;
+  }
+  .row{display:flex;flex-wrap:wrap;gap:12px;align-items:center;}
+  input,select,button{
+    padding:8px 10px;
+    border:1px solid #d1d5db;
+    border-radius:8px;
+    font-size:14px;
+  }
+  button{
+    cursor:pointer;
+    background:var(--primary);
+    color:#fff;
+    border:none;
+  }
+  button.ghost{
+    background:#eef;
+    color:#333;
+  }
+  table{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:12px;
+    font-size:14px;
+  }
+  th,td{
+    border:1px solid #e5e7eb;
+    padding:8px;
+    text-align:center;
+  }
+  th{background:#f3f4f6;}
+  td[contenteditable="true"]{background:#fffdf0;}
+  .muted{color:var(--muted);font-size:12px;}
+  .pill{
+    padding:4px 12px;
+    border-radius:999px;
+    background:#eef;
+    font-size:13px;
+  }
+  .pill.ok{background:var(--ok);color:#fff;}
+  .pill.bad{background:var(--bad);color:#fff;}
+  .modal{
+    position:fixed;inset:0;
+    background:rgba(0,0,0,.35);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding:24px;
+  }
+  .modal .card{
+    max-width:520px;
+    width:100%;
+  }
+</style>
+
+</head>
+<body>
+<div class="wrap">
+
+  <!-- TOKEN -->
+  <div class="card">
+    <div class="row">
+      <strong>Token:</strong>
+      <input id="token" placeholder="API Key" style="width:260px">
+      <button onclick="init()">Conectar</button>
+      <span id="loginInfo" class="muted"></span>
+    </div>
+  </div>
+
+  <!-- FILTROS -->
+  <div class="card">
+    <h2 style="margin:0 0 8px 0;">Filtros</h2>
+    <div class="row">
+      <div>
+        <label>Periodo</label><br>
+        <select id="periodoSelect"><option value="">--Todos--</option></select>
+      </div>
+      <div>
+        <label>Orden</label><br>
+        <select id="ordenSelect"><option value="">--Todos--</option></select>
+      </div>
+      <div>
+        <label>Driver</label><br>
+        <select id="driverSelect"><option value="">--Todos--</option></select>
+      </div>
+      <div>
+        <button onclick="cargarDetalle()">Cargar</button>
+      </div>
+    </div>
+    <div id="fichaInfo" class="muted" style="margin-top:8px;"></div>
+  </div>
+
+  <!-- ACCIONES -->
+  <div class="card">
+    <div class="row">
+      <button onclick="openModalAgregar()">➕ Agregar Fila</button>
+      <button onclick="modificarFila()">✏️ Modificar Fila</button>
+      <button onclick="eliminarFila()">🗑 Eliminar Fila</button>
+      <button onclick="descargarExcel()">⬇️ Descargar Excel</button>
+      <button id="guardarBtn" onclick="enviarPropuesta()" disabled>📤 Enviar Propuesta</button>
+      <span id="totalPill" class="pill">Total: 0%</span>
+    </div>
+  </div>
+
+  <!-- TABLA -->
+  <div class="card">
+    <h3 style="margin-top:0;">Empresas del Driver</h3>
+    <div id="tablaContainer" class="muted">Usa los filtros y pulsa “Cargar”.</div>
+  </div>
+
+</div>
+
+<!-- MODAL AGREGAR FILA -->
+<div id="modalAgregar" class="modal">
+  <div class="card">
+    <h3>Agregar Empresa</h3>
+
+    <div class="row">
+      <div>
+        <label>Periodo</label><br>
+        <input id="addPeriodo" style="width:100px">
+      </div>
+      <div>
+        <label>Orden</label><br>
+        <input id="addOrden" style="width:180px">
+      </div>
+      <div>
+        <label>Driver</label><br>
+        <input id="addDriver" style="width:180px">
+      </div>
+    </div>
+
+    <div class="row" style="margin-top:12px;">
+      <div>
+        <label>Empresa</label><br>
+        <input id="addEmpresa" style="width:200px">
+      </div>
+      <div>
+        <label>% Asignado</label><br>
+        <input id="addPct" type="number" step="0.01" style="width:100px">
+      </div>
+    </div>
+
+    <div class="row" style="margin-top:16px;">
+      <button onclick="agregarFila()">Agregar</button>
+      <button class="ghost" onclick="closeModalAgregar()">Cerrar</button>
+      <span id="addStatus" class="muted"></span>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const API = "http://localhost:8000";
+
+let TOKEN = "";
+let catalogo = [];
+let detalle = [];
+let filaSeleccionada = null;
+
+const toStr = v => v == null ? "" : String(v);
+
+// INIT
+async function init(){
+  TOKEN = document.getElementById("token").value.trim();
+  if(!TOKEN){ alert("Ingresa token"); return; }
+
+  try {
+    const res = await fetch(`${API}/catalogo-drivers`, {
+      headers:{Authorization:`Bearer ${TOKEN}`}
+    });
+    if(!res.ok) throw new Error("Token inválido");
+
+    catalogo = await res.json();
+
+    const periodos = [...new Set(catalogo.map(r=>r.periodo))];
+    renderSelect("periodoSelect", periodos);
+
+    const ordenes = [...new Set(catalogo.map(r=>r.orden_estadistica))];
+    renderSelect("ordenSelect", ordenes);
+
+    const drivers = [...new Set(catalogo.map(r=>r.nombre_driver))];
+    renderSelect("driverSelect", drivers);
+
+    document.getElementById("loginInfo").textContent = "Conectado correctamente.";
+  } catch(err){
+    alert("Error al conectar.");
+  }
+}
+
+function renderSelect(id, arr){
+  const sel = document.getElementById(id);
+  sel.innerHTML = `<option value="">--Todos--</option>` +
+    arr.map(x=>`<option value="${x}">${x}</option>`).join("");
+}
+
+// CARGAR DETALLE
+async function cargarDetalle(){
+  const p = document.getElementById("periodoSelect").value;
+  const o = document.getElementById("ordenSelect").value;
+  const d = document.getElementById("driverSelect").value;
+
+  const params = new URLSearchParams();
+  if(p) params.append("periodo", p);
+  if(o) params.append("orden", o);
+  if(d) params.append("driver", d);
+
+  const r = await fetch(`${API}/mis-drivers?${params.toString()}`, {
+    headers:{Authorization:`Bearer ${TOKEN}`}
+  });
+  const data = await r.json();
+  if(!r.ok){ alert(data.detail || "Error"); return; }
+
+  detalle = data;
+  renderTabla();
+  updateTotal();
+
+  document.getElementById("guardarBtn").disabled = false;
+
+  document.getElementById("fichaInfo").textContent =
+    `Periodo ${p||'-'} — Orden ${o||'-'} — Driver ${d||'-'}`;
+}
+
+// TABLA
+function renderTabla(){
+  if(!detalle.length){
+    document.getElementById("tablaContainer").innerHTML =
+      "<div class='muted'>Sin datos</div>";
+    return;
+  }
+
+  let html = `
+    <table>
+      <tr>
+        <th>#</th>
+        <th>Periodo</th>
+        <th>Orden</th>
+        <th>Driver</th>
+        <th>Empresa</th>
+        <th>% Asignado</th>
+        <th>% Nuevo (edit)</th>
+      </tr>
+  `;
+
+  detalle.forEach((r,i)=>{
+    html += `
+      <tr onclick="filaSeleccionada=${i}">
+        <td>${i}</td>
+        <td>${r.periodo}</td>
+        <td>${r.orden_estadistica}</td>
+        <td>${r.nombre_driver}</td>
+        <td>${r.empresa}</td>
+        <td>${Number(r.porcentaje_asignado).toFixed(2)}</td>
+        <td contenteditable="true" data-i="${i}"
+            oninput="editarPct(event)">
+            ${Number(r.porcentaje_asignado).toFixed(2)}
+        </td>
+      </tr>`;
+  });
+
+  html += "</table>";
+
+  document.getElementById("tablaContainer").innerHTML = html;
+}
+
+function editarPct(ev){
+  const i = ev.target.dataset.i;
+  let val = parseFloat(ev.target.innerText.replace(",", ".")) || 0;
+  detalle[i].porcentaje_asignado = val;
+  updateTotal();
+}
+
+function updateTotal(){
+  const total = detalle.reduce(
+    (s,x)=>s + (parseFloat(x.porcentaje_asignado)||0), 0
+  );
+
+  const pill = document.getElementById("totalPill");
+  pill.textContent = `Total: ${total.toFixed(2)}%`;
+
+  if(Math.abs(total - 100) < 0.01) pill.className = "pill ok";
+  else if(total > 100) pill.className = "pill bad";
+  else pill.className = "pill";
+}
+
+// -------------------- AGREGAR FILA --------------------
+function openModalAgregar(){
+  document.getElementById("modalAgregar").style.display="flex";
+}
+function closeModalAgregar(){
+  document.getElementById("modalAgregar").style.display="none";
+}
+
+async function agregarFila(){
+  const payload = {
+    periodo: document.getElementById("addPeriodo").value,
+    orden_estadistica: document.getElementById("addOrden").value,
+    nombre_driver: document.getElementById("addDriver").value,
+    empresa: document.getElementById("addEmpresa").value,
+    porcentaje_asignado: parseFloat(document.getElementById("addPct").value)
+  };
+
+  const r = await fetch(`${API}/drivers/agregar`, {
+    method:"POST",
+    headers:{
+      "Content-Type":"application/json",
+      Authorization:`Bearer ${TOKEN}`
+    },
+    body:JSON.stringify(payload)
+  });
+
+  const data = await r.json();
+  if(!r.ok){ alert("Error al agregar"); return; }
+
+  document.getElementById("addStatus").textContent = "Agregado!";
+  closeModalAgregar();
+  await cargarDetalle();
+}
+
+// -------------------- MODIFICAR FILA --------------------
+async function modificarFila(){
+  if(filaSeleccionada == null) return alert("Selecciona una fila");
+
+  const r = detalle[filaSeleccionada];
+
+  const payload = {
+    periodo:r.periodo,
+    orden_estadistica:r.orden_estadistica,
+    nombre_driver:r.nombre_driver,
+    empresa:r.empresa,
+    porcentaje_asignado:r.porcentaje_asignado
+  };
+
+  const rq = await fetch(`${API}/drivers/modificar`, {
+    method:"POST",
+    headers:{
+      "Content-Type":"application/json",
+      Authorization:`Bearer ${TOKEN}`
+    },
+    body:JSON.stringify(payload)
+  });
+
+  const data = await rq.json();
+  if(!rq.ok){ alert("Error modificando"); return; }
+
+  alert("Fila modificada");
+  await cargarDetalle();
+}
+
+// -------------------- ELIMINAR FILA --------------------
+async function eliminarFila(){
+  if(filaSeleccionada == null) return alert("Selecciona una fila");
+  const r = detalle[filaSeleccionada];
+
+  if(!confirm(`¿Eliminar empresa '${r.empresa}'?`)) return;
+
+  const payload = {
+    periodo:r.periodo,
+    orden_estadistica:r.orden_estadistica,
+    nombre_driver:r.nombre_driver,
+    empresa:r.empresa
+  };
+
+  const rq = await fetch(`${API}/drivers/eliminar`, {
+    method:"POST",
+    headers:{
+      "Content-Type":"application/json",
+      Authorization:`Bearer ${TOKEN}`
+    },
+    body:JSON.stringify(payload)
+  });
+
+  const data = await rq.json();
+  if(!rq.ok){ alert("Error eliminando"); return; }
+
+  alert("Fila eliminada");
+  await cargarDetalle();
+}
+
+// -------------------- DESCARGAR EXCEL --------------------
+async function descargarExcel(){
+  try{
+    const r = await fetch(`${API}/drivers/exportar`, {
+      method: "GET",
+      headers: { Authorization: `Bearer ${TOKEN}` }
+    });
+
+    if(!r.ok){
+      const msg = await r.json();
+      alert("Error descargando archivo: " + (msg.detail || ""));
+      return;
+    }
+
+    // Convertimos respuesta en blob
+    const blob = await r.blob();
+
+    // Crear URL temporal
+    const url = window.URL.createObjectURL(blob);
+
+    // Crear link invisible
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "drivers_export.xlsx";
+    document.body.appendChild(a);
+
+    // Click automático → descarga
+    a.click();
+
+    // Limpieza
+    a.remove();
+    window.URL.revokeObjectURL(url);
+
+  } catch(err){
+    alert("Error descargando archivo");
+    console.error(err);
+  }
+}
+
+// -------------------- ENVIAR PROPUESTA --------------------
+async function enviarPropuesta(){
+  if(!detalle.length) return alert("No hay datos");
+
+  const empresas = detalle.map(x=>({
+    periodo:x.periodo,
+    orden_estadistica:x.orden_estadistica,
+    nombre_driver:x.nombre_driver,
+    empresa:x.empresa,
+    porcentaje_nuevo:x.porcentaje_asignado
+  }));
+
+  const payload = {empresas};
+
+  const r = await fetch(`${API}/drivers/enviar-propuesta`, {
+    method:"POST",
+    headers:{
+      "Content-Type":"application/json",
+      Authorization:`Bearer ${TOKEN}`
+    },
+    body:JSON.stringify(payload)
+  });
+
+  const data = await r.json();
+  if(!r.ok){ alert("Error enviando"); return; }
+
+  alert(`Propuesta enviada ✔\nID: ${data.propuesta_id}`);
+}
+
+</script>
+
+</body>
+</html>
