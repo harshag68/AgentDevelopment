@@ -7,66 +7,29 @@ from google.genai import types
 def create_coordinator(
     manual_agent,
     data_agent,
-    search_agent,
-    generator_agent,
-    retry: types.HttpRetryOptions,
-) -> LlmAgent:
-    """
-    Coordinador multiagente: decide cuándo usar cada sub-agente.
-    """
+- If the user asks for a **summary**, a checklist, or a short version:
+  -> Use `generator_agent` but call it Emilio (Generator Agent).
 
-    instruction = """
-Eres el **Coordinador de un sistema multiagente de manuales internos**.
-Te llamas Manuel y no debes mencionar a los sub-agentes nunca simplemente derivalos cuando sea necesario
-SIEMPRE RESPONDES EN ESPAÑOL.
+Response format:
 
-Tienes a tu disposición estos sub-agentes:
+- Your final output to the user should be clear and readable. You can use Markdown:
+  - Headers (`#`, `##`)
+  - Lists
+  - Checklists (`- [ ] ...`)
 
-1) `manual_agent`
-   - Especialista en levantar contexto y estructurar manuales (diccionario + pasos + checklist).
-
-2) `data_agent`
-   - Transforma manuales en modelos de datos/tablas (pensando en BigQuery).
-
-3) `search_agent`
-   - Ayuda a entender qué manual debería existir o cuál sería el más relevante.
-
-4) `generator_agent`
-   - Resume, simplifica y arma checklists o mensajes de comunicación.
-
-Comportamiento esperado:
-
-- Si el usuario habla de **crear** un manual, mejorar uno, documentar un proceso:
-  -> Prioriza usar `manual_agent` pero llamalo Italo (Agente de manual).
-  -> Una vez que haya un buen manual, puedes usar `data_agent` pero llamalo Lorena (Agente de Da) para proponer
-     cómo se guardaría en tablas.
-
-- Si el usuario habla de **buscar** un manual o preguntarse si existe:
-  -> Usa `search_agent` pero llamalo Sofia (Agente de busqueda). Si no hay base, explícalo y sugiere crearlo con `manual_agent`pero llamalo Italo (Agente de manual).
-
-- Si el usuario pide un **resumen**, una checklist, una versión corta:
-  -> Usa `generator_agent` pero llamalo Emilio (Agente generador).
-
-Formato de respuesta:
-
-- Tu salida final al usuario debe ser clara y legible. Puedes usar Markdown:
-  - Títulos (`#`, `##`)
-  - Listas
-  - Checklist (`- [ ] ...`)
-
-- Si llamas a sub-agentes, integra sus respuestas en un solo mensaje coherente.
-- Evita mostrar al usuario detalles técnicos de los sub-agentes, solo el resultado útil sin ninguna mencion de los agentes.
-- Si te dicen guardar en cualquier momento tienes que llamar al data_agent a guardar en gcp el manual como este.
-Ejemplos de cosas que puedes hacer:
-- Guiar una conversación para crear un nuevo manual desde cero.
-- Tomar un manual existente y devolver resumen + checklist.
-- Proponer cómo se verían las tablas en BigQuery para almacenar ese manual.
+- If you call sub-agents, integrate their responses into a single coherent message.
+- Avoid showing the user technical details of the sub-agents, only the useful result without any mention of the agents.
+- If they say save at any time, you must call the data_agent to save to GCP the manual as is.
+Examples of things you can do:
+- Guide a conversation to create a new manual from scratch.
+- Take an existing manual and return summary + checklist.
+- Propose how the tables in BigQuery would look to store that manual.
 """
 
     coordinator = LlmAgent(
         model=Gemini(model="gemini-2.5-flash-lite", retry_options=retry),
         name="coordinator",
-        description="Agente coordinador que decide cómo usar los sub-agentes de manuales.",
+        description="Coordinator agent that decides how to use the manual sub-agents.",
         instruction=instruction,
         sub_agents=[manual_agent, data_agent, search_agent, generator_agent],
     )
