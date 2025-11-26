@@ -1,58 +1,3 @@
-# manual_store_gcp.py
-from datetime import datetime, timezone
-import uuid
-from typing import List, Dict
-
-from google.cloud import bigquery, storage
-
-from settings import (
-    PROJECT_ID,
-    BQ_DATASET,
-    MANUALS_BUCKET,
-)
-
-# Tablas
-MANUALS_TABLE = f"{PROJECT_ID}.{BQ_DATASET}.manuals_dict"
-STEPS_TABLE   = f"{PROJECT_ID}.{BQ_DATASET}.manual_steps"
-FILES_TABLE   = f"{PROJECT_ID}.{BQ_DATASET}.manual_files"
-
-bq_client = bigquery.Client(project=PROJECT_ID)
-storage_client = storage.Client(project=PROJECT_ID)
-bucket = storage_client.bucket(MANUALS_BUCKET)
-
-
-def _render_manual_html(manual: dict) -> str:
-    title = manual.get("title", "Manual sin título")
-    context = manual.get("context", "")
-    requirements = manual.get("requirements", "")
-    permissions = manual.get("permissions", "")
-    outputs = manual.get("outputs", "")
-    steps = manual.get("steps", [])
-
-    html_steps = ""
-    for i, step in enumerate(steps, start=1):
-        html_steps += f"""
-        <section>
-          <h2>Paso {i}: {step.get('step_title','')}</h2>
-          <p>{step.get('step_description','')}</p>
-          <p><strong>Resultado esperado:</strong> {step.get('expected_output','')}</p>
-          <p><strong>Herramientas:</strong> {step.get('required_tools','')}</p>
-          <p><strong>Tiempo estimado:</strong> {step.get('estimated_time','')}</p>
-          <p><strong>Crítico:</strong> {"Sí" if step.get("is_critical") else "No"}</p>
-        </section>
-        """
-
-    html = f"""
-    <!DOCTYPE html>
-    <html lang="es">
-    <head>
-      <meta charset="UTF-8" />
-      <title>{title}</title>
-      <style>
-        body {{ font-family: system-ui, sans-serif; max-width: 800px; margin:0 auto; padding:16px; }}
-        h1 {{ margin-bottom: 0; }}
-        h2 {{ margin-top: 24px; }}
-        section {{ margin-bottom: 16px; }}
       </style>
     </head>
     <body>
@@ -88,12 +33,12 @@ def save_manual(manual_struct: dict) -> dict:
     manual_id = manual_struct.get("manual_id") or f"MAN-{uuid.uuid4().hex[:10]}"
     version = manual_struct.get("version") or 1
 
-    # keywords: aseguramos lista
+    # keywords: ensure list
     keywords = manual_struct.get("keywords") or []
     if isinstance(keywords, str):
         keywords = [k.strip() for k in keywords.split(",") if k.strip()]
 
-    # 1) Render HTML y subir a GCS
+    # 1) Render HTML and upload to GCS
     html = _render_manual_html(manual_struct)
     blob_path = f"manuals/{manual_id}/v{version}.html"
     blob = bucket.blob(blob_path)
@@ -103,7 +48,7 @@ def save_manual(manual_struct: dict) -> dict:
     gcs_uri = f"gs://{MANUALS_BUCKET}/{blob_path}"
     print(">>> [manual_store_gcp] HTML subido OK:", gcs_uri)
 
-    # 2) Fila manuals_dict
+    # 2) manuals_dict row
     manuals_row = {
         "manual_id": manual_id,
         "title": manual_struct.get("title"),
@@ -126,7 +71,7 @@ def save_manual(manual_struct: dict) -> dict:
         raise RuntimeError(f"Error insertando en manuals_dict: {errors}")
     print(">>> [manual_store_gcp] OK manuals_dict")
 
-    # 3) Fila steps
+    # 3) steps row
     steps = manual_struct.get("steps", [])
     step_rows = []
     for idx, step in enumerate(steps, start=1):
@@ -151,7 +96,7 @@ def save_manual(manual_struct: dict) -> dict:
             raise RuntimeError(f"Error insertando en manual_steps: {errors}")
         print(">>> [manual_store_gcp] OK manual_steps")
 
-    # 4) Fila files
+    # 4) files row
     files_row = {
         "manual_id": manual_id,
         "version": version,
@@ -201,7 +146,7 @@ def search_manuals(query: str = "") -> List[Dict]:
 
     try:
         if not q:
-            # Sin filtro: mismo comportamiento que el test_raw
+            # No filter: same behavior as test_raw
             sql = f"""
               SELECT
                 manual_id,
@@ -220,7 +165,7 @@ def search_manuals(query: str = "") -> List[Dict]:
             job = bq_client.query(sql)
 
         else:
-            # Con filtro por texto (en título, contexto, outputs o keywords)
+            # With text filter (in title, context, outputs or keywords)
             sql = f"""
               SELECT
                 manual_id,
@@ -279,7 +224,7 @@ def search_manuals(query: str = "") -> List[Dict]:
     except Exception as e:
         print("!!! ERROR en search_manuals:", repr(e))
         print("-------------------------------------------------\n")
-        # Siempre devolvemos lista, nunca None
+        # Always return list, never None
         return []
 
 

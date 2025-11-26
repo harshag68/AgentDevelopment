@@ -1,182 +1,311 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <title>Manuel El Manual</title>
-    <!-- Favicon -->
+  <!-- Favicon -->
   <link rel="icon" type="image/x-icon" href="manuel.ico" />
   <link rel="shortcut icon" type="image/x-icon" href="manuel.ico" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
-    body { font-family: system-ui, sans-serif; background:#0f172a; color:#e5e7eb; margin:0; padding:0; }
+    body {
+      font-family: system-ui, sans-serif;
+      background: #0f172a;
+      color: #e5e7eb;
+      margin: 0;
+      padding: 0;
+    }
 
-    /* Layout general */
+    /* General Layout */
     .layout {
-      display:flex;
-      min-height:100vh;
+      display: flex;
+      min-height: 100vh;
     }
 
     .sidebar {
-      width:200px;
-      background:#020617;
-      border-right:1px solid #1e293b;
-      padding:16px 12px;
-      display:flex;
-      flex-direction:column;
-      gap:12px;
+      width: 200px;
+      background: #020617;
+      border-right: 1px solid #1e293b;
+      padding: 16px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
     }
 
     .sidebar h2 {
-      margin:0 0 8px 0;
-      font-size:1rem;
+      margin: 0 0 8px 0;
+      font-size: 1rem;
     }
 
     .sidebar p {
-      margin:0 0 8px 0;
-      font-size:0.8rem;
-      color:#9ca3af;
+      margin: 0 0 8px 0;
+      font-size: 0.8rem;
+      color: #9ca3af;
     }
 
     .sidebar button {
-      width:100%;
-      border:none;
-      border-radius:999px;
-      padding:8px 10px;
-      cursor:pointer;
-      font-size:0.85rem;
-      text-align:left;
-      display:flex;
-      align-items:center;
-      gap:8px;
+      width: 100%;
+      border: none;
+      border-radius: 999px;
+      padding: 8px 10px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      text-align: left;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
 
-    .btn-side-create { background:#22c55e; color:#020617; }
-    .btn-side-search { background:#0ea5e9; color:#020617; }
-    .btn-side-edit   { background:#f97316; color:#020617; }
-    .btn-side-delete { background:#ef4444; color:#020617; }
+    .btn-side-create {
+      background: #22c55e;
+      color: #020617;
+    }
+
+    .btn-side-search {
+      background: #0ea5e9;
+      color: #020617;
+    }
+
+    .btn-side-edit {
+      background: #f97316;
+      color: #020617;
+    }
+
+    .btn-side-delete {
+      background: #ef4444;
+      color: #020617;
+    }
 
     .main {
-      flex:1;
-      display:flex;
-      flex-direction:column;
-      padding:16px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 16px;
     }
 
-    .app { max-width:900px; margin:0 auto; width:100%; }
+    .app {
+      max-width: 900px;
+      margin: 0 auto;
+      width: 100%;
+    }
 
-    .chat-box { background:#020617; border-radius:16px; padding:16px; height:60vh; overflow-y:auto; border:1px solid #1e293b; }
-    .msg { margin:8px 0; padding:8px 12px; border-radius:12px; max-width:80%; white-space:pre-wrap; }
-    .msg.user { margin-left:auto; background:#1d4ed8; }
-    .msg.bot { margin-right:auto; background:#111827; }
+    .chat-box {
+      background: #020617;
+      border-radius: 16px;
+      padding: 16px;
+      height: 60vh;
+      overflow-y: auto;
+      border: 1px solid #1e293b;
+    }
 
-    .input-row { display:flex; gap:8px; margin-top:12px; align-items:center; }
+    .msg {
+      margin: 8px 0;
+      padding: 8px 12px;
+      border-radius: 12px;
+      max-width: 80%;
+      white-space: pre-wrap;
+    }
+
+    .msg.user {
+      margin-left: auto;
+      background: #1d4ed8;
+    }
+
+    .msg.bot {
+      margin-right: auto;
+      background: #111827;
+    }
+
+    .input-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+      align-items: center;
+    }
+
     .input-row input {
-      flex:1; padding:8px 10px; border-radius:999px;
-      border:1px solid #4b5563; background:#020617; color:#e5e7eb;
+      flex: 1;
+      padding: 8px 10px;
+      border-radius: 999px;
+      border: 1px solid #4b5563;
+      background: #020617;
+      color: #e5e7eb;
     }
-    .input-row button { border:none; border-radius:999px; padding:8px 14px; cursor:pointer; font-size:0.9rem; }
 
-    .btn-send { background:#22c55e; color:#020617; }
-    .btn-mic-on { background:#0ea5e9; color:#020617; }
-    .btn-mic-off { background:#1e293b; color:#e5e7eb; }
-    .btn-list { background:#a855f7; color:#020617; }
+    .input-row button {
+      border: none;
+      border-radius: 999px;
+      padding: 8px 14px;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+
+    .btn-send {
+      background: #22c55e;
+      color: #020617;
+    }
+
+    .btn-mic-on {
+      background: #0ea5e9;
+      color: #020617;
+    }
+
+    .btn-mic-off {
+      background: #1e293b;
+      color: #e5e7eb;
+    }
+
+    .btn-list {
+      background: #a855f7;
+      color: #020617;
+    }
 
     .status-pill {
-      display:inline-flex; align-items:center; gap:6px;
-      padding:4px 10px; border-radius:999px;
-      background:#022c22; color:#bbf7d0; font-size:0.75rem;
-      margin-bottom:8px;
-    }
-    .status-dot {
-      width:8px; height:8px; border-radius:999px; background:#22c55e;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: #022c22;
+      color: #bbf7d0;
+      font-size: 0.75rem;
+      margin-bottom: 8px;
     }
 
-    /* Modal de manuales */
-    .modal-backdrop {
-      position:fixed; inset:0; background:rgba(15,23,42,0.85);
-      display:none; align-items:center; justify-content:center;
-      z-index:50;
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: #22c55e;
     }
-    .modal-backdrop.show { display:flex; }
+
+    /* Manuals Modal */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.85);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 50;
+    }
+
+    .modal-backdrop.show {
+      display: flex;
+    }
 
     .modal {
-      background:#020617; border-radius:16px; border:1px solid #1e293b;
-      max-width:600px; width:90%; max-height:70vh;
-      display:flex; flex-direction:column; padding:16px;
-      box-shadow:0 20px 40px rgba(0,0,0,0.6);
+      background: #020617;
+      border-radius: 16px;
+      border: 1px solid #1e293b;
+      max-width: 600px;
+      width: 90%;
+      max-height: 70vh;
+      display: flex;
+      flex-direction: column;
+      padding: 16px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
     }
+
     .modal-header {
-      display:flex; justify-content:space-between; align-items:center;
-      margin-bottom:8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
     }
-    .modal-header h3 { margin:0; font-size:1rem; }
+
+    .modal-header h3 {
+      margin: 0;
+      font-size: 1rem;
+    }
+
     .modal-header button {
-      border:none; background:#1e293b; color:#e5e7eb;
-      border-radius:999px; padding:4px 8px; cursor:pointer;
+      border: none;
+      background: #1e293b;
+      color: #e5e7eb;
+      border-radius: 999px;
+      padding: 4px 8px;
+      cursor: pointer;
     }
+
     .modal-list {
-      margin-top:8px; padding-top:8px; border-top:1px solid #1e293b;
-      overflow-y:auto; flex:1;
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid #1e293b;
+      overflow-y: auto;
+      flex: 1;
     }
+
     .manual-item {
-      padding:8px; border-radius:8px; margin-bottom:6px;
-      background:#020617; border:1px solid #1e293b;
-      cursor:pointer;
+      padding: 8px;
+      border-radius: 8px;
+      margin-bottom: 6px;
+      background: #020617;
+      border: 1px solid #1e293b;
+      cursor: pointer;
     }
+
     .manual-item h4 {
-      margin:0 0 4px 0; font-size:0.95rem;
+      margin: 0 0 4px 0;
+      font-size: 0.95rem;
     }
+
     .manual-item p {
-      margin:0; font-size:0.8rem; color:#9ca3af;
+      margin: 0;
+      font-size: 0.8rem;
+      color: #9ca3af;
     }
+
     .modal-mode-label {
-      font-size:0.8rem;
-      color:#9ca3af;
-      margin-top:4px;
+      font-size: 0.8rem;
+      color: #9ca3af;
+      margin-top: 4px;
     }
   </style>
 </head>
+
 <body>
   <div class="layout">
-    <!-- Barra lateral -->
+    <!-- Sidebar -->
     <aside class="sidebar">
       <h2>Manuel</h2>
-      <p>Acciones rápidas sobre manuales:</p>
-      <button id="btnCreate" class="btn-side-create">📝 Crear manual</button>
-      <button id="btnSearch" class="btn-side-search">🔍 Buscar manual</button>
-      <button id="btnEdit" class="btn-side-edit">✏️ Modificar manual</button>
-      <button id="btnDelete" class="btn-side-delete">🗑️ Eliminar manual</button>
-      <button id="btnSave" class="btn-side-create">💾 Guardalo en GCP</button>
+      <p>Quick actions for manuals:</p>
+      <button id="btnCreate" class="btn-side-create">📝 Create manual</button>
+      <button id="btnSearch" class="btn-side-search">🔍 Search manual</button>
+      <button id="btnEdit" class="btn-side-edit">✏️ Modify manual</button>
+      <button id="btnDelete" class="btn-side-delete">🗑️ Delete manual</button>
+      <button id="btnSave" class="btn-side-create">💾 Save to GCP</button>
     </aside>
 
-    <!-- Contenido principal -->
+    <!-- Main Content -->
     <main class="main">
       <div class="app">
         <h1>Manuel El Manual</h1>
-        <p>Habla con el agente para crear, buscar y modificar manuales.</p>
+        <p>Talk with the agent to create, search, and modify manuals.</p>
 
         <div class="status-pill">
           <span class="status-dot"></span>
-          <span id="voiceStatus">Voz: OFF</span>
+          <span id="voiceStatus">Voice: OFF</span>
         </div>
 
         <div id="chat" class="chat-box"></div>
 
         <div class="input-row">
-          <input id="question" type="text" placeholder="Escribe o habla con Manuel..." />
-          <button class="btn-list" id="listBtn" title="Ver manuales/diccionarios">📚</button>
-          <button class="btn-mic-off" id="micBtn" title="Activar / desactivar voz">🎙 OFF</button>
-          <button class="btn-send" id="sendBtn">Enviar</button>
+          <input id="question" type="text" placeholder="Type or talk with Manuel..." />
+          <button class="btn-list" id="listBtn" title="View manuals/dictionaries">📚</button>
+          <button class="btn-mic-off" id="micBtn" title="Enable / disable voice">🎙 OFF</button>
+          <button class="btn-send" id="sendBtn">Send</button>
         </div>
       </div>
     </main>
   </div>
 
-  <!-- Modal de manuales -->
+  <!-- Manuals Modal -->
   <div id="manualsModalBackdrop" class="modal-backdrop">
     <div class="modal">
       <div class="modal-header">
-        <h3>Manuales disponibles</h3>
+        <h3>Available Manuals</h3>
         <button id="closeManualsBtn">✕</button>
       </div>
       <div id="modalModeLabel" class="modal-mode-label"></div>
@@ -185,311 +314,312 @@
   </div>
 
   <script>
-  const API_BASE = "http://127.0.0.1:8080";
+    const API_BASE = "http://127.0.0.1:8080";
 
-  const chat = document.getElementById("chat");
-  const input = document.getElementById("question");
-  const sendBtn = document.getElementById("sendBtn");
-  const micBtn = document.getElementById("micBtn");
-  const voiceStatus = document.getElementById("voiceStatus");
+    const chat = document.getElementById("chat");
+    const input = document.getElementById("question");
+    const sendBtn = document.getElementById("sendBtn");
+    const micBtn = document.getElementById("micBtn");
+    const voiceStatus = document.getElementById("voiceStatus");
 
-  const listBtn = document.getElementById("listBtn");
-  const manualsModalBackdrop = document.getElementById("manualsModalBackdrop");
-  const manualsList = document.getElementById("manualsList");
-  const closeManualsBtn = document.getElementById("closeManualsBtn");
-  const modalModeLabel = document.getElementById("modalModeLabel");
+    const listBtn = document.getElementById("listBtn");
+    const manualsModalBackdrop = document.getElementById("manualsModalBackdrop");
+    const manualsList = document.getElementById("manualsList");
+    const closeManualsBtn = document.getElementById("closeManualsBtn");
+    const modalModeLabel = document.getElementById("modalModeLabel");
 
-  const btnCreate = document.getElementById("btnCreate");
-  const btnSearch = document.getElementById("btnSearch");
-  const btnEdit   = document.getElementById("btnEdit");
-  const btnDelete = document.getElementById("btnDelete");
-  const btnSave   = document.getElementById("btnSave"); 
+    const btnCreate = document.getElementById("btnCreate");
+    const btnSearch = document.getElementById("btnSearch");
+    const btnEdit = document.getElementById("btnEdit");
+    const btnDelete = document.getElementById("btnDelete");
+    const btnSave = document.getElementById("btnSave");
 
-  let voiceEnabled = false;
-  let recognition = null;
-  let manualsSelectionMode = "view"; // "view" | "edit" | "delete"
+    let voiceEnabled = false;
+    let recognition = null;
+    let manualsSelectionMode = "view"; // "view" | "edit" | "delete"
 
-  // 🔹 NUEVO: formatear el texto (negrita tipo **texto** + saltos de línea)
-  function formatMessage(text) {
-    if (!text) return "";
+    // 🔹 NEW: format text (bold like **text** + line breaks)
+    function formatMessage(text) {
+      if (!text) return "";
 
-    // Escapar HTML básico
-    let safe = text
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;");
+      // Escape basic HTML
+      let safe = text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
 
-    // Negrita estilo Markdown: **texto**
-    safe = safe.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
+      // Markdown-style bold: **text**
+      safe = safe.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
 
-    // Saltos de línea a <br>
-    safe = safe.replace(/\n/g, "<br>");
+      // Line breaks to <br>
+      safe = safe.replace(/\n/g, "<br>");
 
-    return safe;
-  }
-
-  function addMessage(text, role) {
-    const div = document.createElement("div");
-    div.className = "msg " + role;
-    // ANTES: div.textContent = text;
-    // AHORA: usamos innerHTML con formato controlado
-    div.innerHTML = formatMessage(text);
-    chat.appendChild(div);
-    chat.scrollTop = chat.scrollHeight;
-  }
-
-  async function sendQuestion(source = "text") {
-    const q = input.value.trim();
-    if (!q) return;
-
-    addMessage(q, "user");
-    input.value = "";
-
-    // Siempre que el usuario pregunta, cortamos lo que esté hablando la síntesis de voz
-    if ("speechSynthesis" in window) {
-      window.speechSynthesis.cancel();
+      return safe;
     }
 
-    sendBtn.disabled = true;
-    sendBtn.textContent = "Enviando...";
+    function addMessage(text, role) {
+      const div = document.createElement("div");
+      div.className = "msg " + role;
+      // BEFORE: div.textContent = text;
+      // NOW: using innerHTML with controlled formatting
+      div.innerHTML = formatMessage(text);
+      chat.appendChild(div);
+      chat.scrollTop = chat.scrollHeight;
+    }
 
-    try {
-      const resp = await fetch(API_BASE + "/ask", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ question: q }),
-      });
+    async function sendQuestion(source = "text") {
+      const q = input.value.trim();
+      if (!q) return;
 
-      if (!resp.ok) {
-        const text = await resp.text();
-        console.error(text);
-        addMessage("Error del servidor: " + resp.status, "bot");
-      } else {
-        const data = await resp.json();
-        const answer = data.answer || "(sin respuesta)";
-        addMessage(answer, "bot");
+      addMessage(q, "user");
+      input.value = "";
 
-        if (voiceEnabled) {
-          speakText(answer);
+      // Whenever the user asks a question, cancel any ongoing speech synthesis
+      if ("speechSynthesis" in window) {
+        window.speechSynthesis.cancel();
+      }
+
+      sendBtn.disabled = true;
+      sendBtn.textContent = "Sending...";
+
+      try {
+        const resp = await fetch(API_BASE + "/ask", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ question: q }),
+        });
+
+        if (!resp.ok) {
+          const text = await resp.text();
+          console.error(text);
+          addMessage("Server error: " + resp.status, "bot");
+        } else {
+          const data = await resp.json();
+          const answer = data.answer || "(no response)";
+          addMessage(answer, "bot");
+
+          if (voiceEnabled) {
+            speakText(answer);
+          }
         }
-      }
-    } catch (err) {
-      console.error(err);
-      addMessage("No se pudo conectar al backend.", "bot");
-    } finally {
-      sendBtn.disabled = false;
-      sendBtn.textContent = "Enviar";
-    }
-  }
-
-  sendBtn.addEventListener("click", () => sendQuestion("text"));
-  input.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") sendQuestion("text");
-  });
-
-  // ---------- Voz: reconocimiento ----------
-  function setupRecognition() {
-    if (!("webkitSpeechRecognition" in window || "SpeechRecognition" in window)) {
-      console.warn("Reconocimiento de voz no soportado");
-      micBtn.disabled = true;
-      micBtn.title = "Reconocimiento de voz no soportado en este navegador";
-      return;
-    }
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    recognition = new SpeechRecognition();
-    recognition.lang = "es-CL";
-    recognition.continuous = true;
-    recognition.interimResults = false;
-
-    recognition.onresult = (event) => {
-      const text = event.results[event.results.length - 1][0].transcript;
-      input.value = text;
-      sendQuestion("voice");
-    };
-
-    recognition.onerror = (e) => {
-      console.error(e);
-    };
-
-    recognition.onend = () => {
-      if (voiceEnabled) {
-        try {
-          recognition.start();
-        } catch (err) {
-          console.error("Error al reanudar reconocimiento:", err);
-        }
-      }
-    };
-  }
-
-  setupRecognition();
-
-  function updateVoiceUI() {
-    if (voiceEnabled) {
-      micBtn.classList.remove("btn-mic-off");
-      micBtn.classList.add("btn-mic-on");
-      micBtn.textContent = "🎙 ON";
-      voiceStatus.textContent = "Voz: ON";
-    } else {
-      micBtn.classList.remove("btn-mic-on");
-      micBtn.classList.add("btn-mic-off");
-      micBtn.textContent = "🎙 OFF";
-      voiceStatus.textContent = "Voz: OFF";
-    }
-  }
-
-  micBtn.addEventListener("click", () => {
-    voiceEnabled = !voiceEnabled;
-    updateVoiceUI();
-
-    if ("speechSynthesis" in window) {
-      window.speechSynthesis.cancel();
-    }
-
-    if (recognition) {
-      if (voiceEnabled) {
-        try { recognition.start(); } catch (err) { console.error(err); }
-      } else {
-        recognition.stop();
+      } catch (err) {
+        console.error(err);
+        addMessage("Could not connect to backend.", "bot");
+      } finally {
+        sendBtn.disabled = false;
+        sendBtn.textContent = "Send";
       }
     }
-  });
 
-  // ---------- Voz: síntesis (TTS) ----------
-  function speakText(text) {
-    if (!("speechSynthesis" in window)) return;
-    if (!voiceEnabled) return;
-    if (!text) return;
+    sendBtn.addEventListener("click", () => sendQuestion("text"));
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") sendQuestion("text");
+    });
 
-    const utter = new SpeechSynthesisUtterance(text);
-    utter.lang = "es-ES";
-
-    const voices = window.speechSynthesis.getVoices();
-    const target = voices.find(v =>
-      v.name.includes("Pablo") &&
-      (v.lang === "es-ES" || v.lang.startsWith("es"))
-    );
-    if (target) {
-      utter.voice = target;
-    }
-
-    window.speechSynthesis.speak(utter);
-  }
-
-  if ("speechSynthesis" in window) {
-    window.speechSynthesis.onvoiceschanged = () => {
-      window.speechSynthesis.getVoices();
-    };
-  }
-
-  // ---------- Modal de manuales / diccionarios ----------
-  async function openManualsPopup(mode = "view") {
-    manualsSelectionMode = mode;
-
-    if (mode === "view") {
-      modalModeLabel.textContent = "Haz clic en un manual para verlo en el chat.";
-    } else if (mode === "edit") {
-      modalModeLabel.textContent = "Selecciona un manual para modificarlo.";
-    } else if (mode === "delete") {
-      modalModeLabel.textContent = "Selecciona un manual para solicitar su eliminación.";
-    }
-
-    try {
-      const resp = await fetch(API_BASE + "/manuals");
-      if (!resp.ok) {
-        console.error("Error al obtener manuales", resp.status);
-        alert("No se pudieron cargar los manuales.");
+    // ---------- Voice: recognition ----------
+    function setupRecognition() {
+      if (!("webkitSpeechRecognition" in window || "SpeechRecognition" in window)) {
+        console.warn("Voice recognition not supported");
+        micBtn.disabled = true;
+        micBtn.title = "Voice recognition not supported in this browser";
         return;
       }
-      const data = await resp.json();
-      const results = data.results || [];
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      recognition = new SpeechRecognition();
+      recognition.lang = "en-US";
+      recognition.continuous = true;
+      recognition.interimResults = false;
 
-      console.log("Manuales recibidos:", results);
+      recognition.onresult = (event) => {
+        const text = event.results[event.results.length - 1][0].transcript;
+        input.value = text;
+        sendQuestion("voice");
+      };
 
-      manualsList.innerHTML = "";
-      if (!results.length) {
-        manualsList.innerHTML = "<p>No hay manuales todavía.</p>";
+      recognition.onerror = (e) => {
+        console.error(e);
+      };
+
+      recognition.onend = () => {
+        if (voiceEnabled) {
+          try {
+            recognition.start();
+          } catch (err) {
+            console.error("Error resuming recognition:", err);
+          }
+        }
+      };
+    }
+
+    setupRecognition();
+
+    function updateVoiceUI() {
+      if (voiceEnabled) {
+        micBtn.classList.remove("btn-mic-off");
+        micBtn.classList.add("btn-mic-on");
+        micBtn.textContent = "🎙 ON";
+        voiceStatus.textContent = "Voice: ON";
       } else {
-        for (const m of results) {
-          const div = document.createElement("div");
-          div.className = "manual-item";
-          const kw = (m.keywords || []).join(", ");
-          div.innerHTML = `
-            <h4>${m.title || "(Sin título)"}</h4>
-            <p><strong>ID:</strong> ${m.manual_id}</p>
-            <p><strong>Área:</strong> ${m.business_area || "-"}</p>
-            <p><strong>Palabras clave:</strong> ${kw || "-"}</p>
-          `;
-          div.addEventListener("click", () => handleManualClick(m));
-          manualsList.appendChild(div);
+        micBtn.classList.remove("btn-mic-on");
+        micBtn.classList.add("btn-mic-off");
+        micBtn.textContent = "🎙 OFF";
+        voiceStatus.textContent = "Voice: OFF";
+      }
+    }
+
+    micBtn.addEventListener("click", () => {
+      voiceEnabled = !voiceEnabled;
+      updateVoiceUI();
+
+      if ("speechSynthesis" in window) {
+        window.speechSynthesis.cancel();
+      }
+
+      if (recognition) {
+        if (voiceEnabled) {
+          try { recognition.start(); } catch (err) { console.error(err); }
+        } else {
+          recognition.stop();
         }
       }
+    });
 
-      manualsModalBackdrop.classList.add("show");
-    } catch (err) {
-      console.error(err);
-      alert("Error al cargar los manuales.");
+    // ---------- Voice: synthesis (TTS) ----------
+    function speakText(text) {
+      if (!("speechSynthesis" in window)) return;
+      if (!voiceEnabled) return;
+      if (!text) return;
+
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.lang = "en-US";
+
+      const voices = window.speechSynthesis.getVoices();
+      const target = voices.find(v =>
+        v.name.includes("Samantha") &&
+        (v.lang === "en-US" || v.lang.startsWith("en"))
+      );
+      if (target) {
+        utter.voice = target;
+      }
+
+      window.speechSynthesis.speak(utter);
     }
-  }
 
-  function closeManualsPopup() {
-    manualsModalBackdrop.classList.remove("show");
-  }
+    if ("speechSynthesis" in window) {
+      window.speechSynthesis.onvoiceschanged = () => {
+        window.speechSynthesis.getVoices();
+      };
+    }
 
-  function handleManualClick(m) {
-    const id = m.manual_id;
-    const title = m.title || "(Sin título)";
+    // ---------- Manuals / dictionaries modal ----------
+    async function openManualsPopup(mode = "view") {
+      manualsSelectionMode = mode;
 
-    if (manualsSelectionMode === "view") {
-      input.value = `Muéstrame el manual ${id}: ${title}`;
-      closeManualsPopup();
-      sendQuestion("text");
-    } else if (manualsSelectionMode === "edit") {
-      input.value = `Quiero modificar el manual ${id}: ${title}`;
-      closeManualsPopup();
-      sendQuestion("text");
-    } else if (manualsSelectionMode === "delete") {
-      const ok = confirm(`¿Seguro que quieres eliminar el manual ${id}: ${title}?`);
-      if (ok) {
-        input.value = `Quiero eliminar el manual ${id}: ${title}`;
-        closeManualsPopup();
-        sendQuestion("text");
+      if (mode === "view") {
+        modalModeLabel.textContent = "Click on a manual to view it in the chat.";
+      } else if (mode === "edit") {
+        modalModeLabel.textContent = "Select a manual to modify it.";
+      } else if (mode === "delete") {
+        modalModeLabel.textContent = "Select a manual to request its deletion.";
+      }
+
+      try {
+        const resp = await fetch(API_BASE + "/manuals");
+        if (!resp.ok) {
+          console.error("Error fetching manuals", resp.status);
+          alert("Could not load manuals.");
+          return;
+        }
+        const data = await resp.json();
+        const results = data.results || [];
+
+        console.log("Manuals received:", results);
+
+        manualsList.innerHTML = "";
+        if (!results.length) {
+          manualsList.innerHTML = "<p>No manuals yet.</p>";
+        } else {
+          for (const m of results) {
+            const div = document.createElement("div");
+            div.className = "manual-item";
+            const kw = (m.keywords || []).join(", ");
+            div.innerHTML = `
+            <h4>${m.title || "(No title)"}</h4>
+            <p><strong>ID:</strong> ${m.manual_id}</p>
+            <p><strong>Area:</strong> ${m.business_area || "-"}</p>
+            <p><strong>Keywords:</strong> ${kw || "-"}</p>
+          `;
+            div.addEventListener("click", () => handleManualClick(m));
+            manualsList.appendChild(div);
+          }
+        }
+
+        manualsModalBackdrop.classList.add("show");
+      } catch (err) {
+        console.error(err);
+        alert("Error loading manuals.");
       }
     }
-  }
 
-  listBtn.addEventListener("click", () => openManualsPopup("view"));
-  closeManualsBtn.addEventListener("click", closeManualsPopup);
-
-  manualsModalBackdrop.addEventListener("click", (e) => {
-    if (e.target === manualsModalBackdrop) {
-      closeManualsPopup();
+    function closeManualsPopup() {
+      manualsModalBackdrop.classList.remove("show");
     }
-  });
 
-  // ---------- Botones laterales ----------
-  btnCreate.addEventListener("click", () => {
-    input.value = "Quiero crear un manual nuevo";
-    input.focus();
-    sendQuestion("text");
-  });
+    function handleManualClick(m) {
+      const id = m.manual_id;
+      const title = m.title || "(No title)";
 
-  btnSearch.addEventListener("click", () => {
-    openManualsPopup("view");
-  });
+      if (manualsSelectionMode === "view") {
+        input.value = `Show me manual ${id}: ${title}`;
+        closeManualsPopup();
+        sendQuestion("text");
+      } else if (manualsSelectionMode === "edit") {
+        input.value = `I want to modify manual ${id}: ${title}`;
+        closeManualsPopup();
+        sendQuestion("text");
+      } else if (manualsSelectionMode === "delete") {
+        const ok = confirm(`Are you sure you want to delete manual ${id}: ${title}?`);
+        if (ok) {
+          input.value = `I want to delete manual ${id}: ${title}`;
+          closeManualsPopup();
+          sendQuestion("text");
+        }
+      }
+    }
 
-  btnEdit.addEventListener("click", () => {
-    openManualsPopup("edit");
-  });
+    listBtn.addEventListener("click", () => openManualsPopup("view"));
+    closeManualsBtn.addEventListener("click", closeManualsPopup);
 
-  btnDelete.addEventListener("click", () => {
-    openManualsPopup("delete");
-  });
-  btnSave.addEventListener("click", () => {
-  input.value = "guardalo en gcp usando data_agent";
-  input.focus();
-  sendQuestion("text");
-  });
-</script>
+    manualsModalBackdrop.addEventListener("click", (e) => {
+      if (e.target === manualsModalBackdrop) {
+        closeManualsPopup();
+      }
+    });
+
+    // ---------- Side buttons ----------
+    btnCreate.addEventListener("click", () => {
+      input.value = "I want to create a new manual";
+      input.focus();
+      sendQuestion("text");
+    });
+
+    btnSearch.addEventListener("click", () => {
+      openManualsPopup("view");
+    });
+
+    btnEdit.addEventListener("click", () => {
+      openManualsPopup("edit");
+    });
+
+    btnDelete.addEventListener("click", () => {
+      openManualsPopup("delete");
+    });
+    btnSave.addEventListener("click", () => {
+      input.value = "save it to gcp using data_agent";
+      input.focus();
+      sendQuestion("text");
+    });
+  </script>
 </body>
+
 </html>
